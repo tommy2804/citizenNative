@@ -3372,6 +3372,11 @@ expo-location@~15.0.1:
   resolved "https://registry.yarnpkg.com/expo-location/-/expo-location-15.0.1.tgz#b132b8b50ce4d2dd9257b7b66cec44beeba253a4"
   integrity sha512-GOAP24m8fMahFcBT75H07f2+IQAOCOdNTzb8Ci/19NZ+Y/CY2lIvb55V8zu7Gn0+76FKPb7XC3ebQaq4ctn1QA==
 
+expo-media-library@~15.0.0:
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/expo-media-library/-/expo-media-library-15.0.0.tgz#12b05bb2c3cc209a08acbd2d3e35ba0a6a141003"
+  integrity sha512-BO17VEElQHf2kK45Vuqm4QtutWsT5X4clO8DjTp2BUNvmY+JgOTKsjPs1LIQcNaaum64u/Gfp3V4HV2a6JnHJg==
+
 expo-modules-autolinking@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/expo-modules-autolinking/-/expo-modules-autolinking-1.0.2.tgz#f072f342ab797e43b16ddcdef251fcd4db851e1a"
@@ -3390,6 +3395,11 @@ expo-modules-core@1.1.1:
   dependencies:
     compare-versions "^3.4.0"
     invariant "^2.2.4"
+
+expo-sharing@^11.0.1:
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/expo-sharing/-/expo-sharing-11.0.1.tgz#a2c6beb7458e04762a53b584c3b7b79ae422e2da"
+  integrity sha512-GlI2+fRxfdCNUftFPfqhbCSd6OQaVf/WNAADWZnRanRQRbQdQjM6L0oMmUTwQStc36cmzl+vGgNlouwdmTDseA==
 
 expo-status-bar@~1.4.2:
   version "1.4.2"

@@ -1,6 +1,7 @@
 import { ImageBackground, View, Text, Dimensions } from 'react-native';
 import styled from 'styled-components/native';
 import { Button, Input, Card } from 'react-native-elements';
+
 import { theme } from '../../../theme';
 
 const { width, height } = Dimensions.get('window');
@@ -9,9 +10,10 @@ export const AccountBackground = styled(ImageBackground).attrs({
   //   source: require('../../../../assets/images/homepage_bg.jpg'),
 })`
   flex: 1;
+  width: ${width};
+  height: ${height};
   align-items: center;
   justify-content: center;
-  background-color: #bdcdd6;
 `;
 
 export const AccountCover = styled(Card)`
@@ -22,7 +24,6 @@ export const AccountCover = styled(Card)`
 `;
 
 export const AccountContainer = styled(View)`
-  background-color: rgba(255, 255, 255, 0.5);
   width: 300px;
   height: 300px;
   padding: ${theme.space[4]};
@@ -36,18 +37,21 @@ export const FormButton = styled(Button)`
 export const FormInput = styled(Input)`
   background-color: rgba(255, 255, 255, 0.5);
   width: 300px;
+  margin-bottom: ${theme.space[2]};
 `;
 
 export const PersonalContainer = styled(View)`
   display: flex;
   flex-direction: row;
   width: 50%;
+  height: 20%;
   justify-content: space-between;
 `;
 
 export const PersonalInput = styled(Input)`
   background-color: rgba(255, 255, 255, 0.5);
   width: 200px;
+  margin-bottom: ${theme.space[2]};
 `;
 
 export const Title = styled(Text)`
@@ -60,4 +64,18 @@ export const ErrorContainer = styled(View)`
   align-self: center;
   margin-top: ${theme.space[2]};
   margin-bottom: ${theme.space[2]};
+`;
+export const ButtonsContainer = styled(View)`
+  display: flex;
+  flex-direction: row;
+  align-self: center;
+  width: 80%;
+  justify-content: space-between;
+  position: absolute;
+  top: 600;
+`;
+
+export const CameraButton = styled(Button)`
+  border-radius: 40%;
+  background-color: black;
 `;

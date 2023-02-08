@@ -69,22 +69,6 @@ export const RegisterScreen = () => {
     }
   };
 
-  const onSignInPress = async () => {
-    console.log(email, password);
-    const res = await login({ email, password });
-
-    if (res.status === 201) {
-      try {
-        const jsonValue = JSON.stringify(res.data);
-        writeItemToStorage(jsonValue);
-        navigation.navigate('HomeScreen');
-      } catch (e) {
-        console.error('not stored');
-        // saving error
-      }
-    }
-  };
-
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [repeatedPassword, setRepeatedPassword] = useState('');

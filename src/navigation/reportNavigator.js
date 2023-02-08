@@ -6,12 +6,12 @@ import TakePhoto from '../screens/reportForm/photo';
 import GoReportScreen from '../screens/queekReport/goReportScreen';
 const Stack = createNativeStackNavigator();
 
-export const HomeNavigator = () => (
+export const ReportNavigator = () => (
   <Stack.Navigator
     screenOptions={{
       headerShown: false,
     }}>
-    <Stack.Screen options={{ headerShown: false }} name="main" component={MainScreen} />
+    <Stack.Screen options={{ headerShown: false }} name="main" component={GoReportScreen} />
     <Stack.Screen name="ReportForm" component={ReportForm} />
   </Stack.Navigator>
 );

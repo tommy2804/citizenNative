@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Image } from 'react-native';
 import { Card } from 'react-native-elements';
 import { useTheme } from 'react-native-paper';
 import { AntDesign as Icon } from '@expo/vector-icons';
@@ -8,9 +8,19 @@ import { LottieAnimationWrapper } from '../../components/styles/lottieAnimtions'
 import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCurrentLocation } from '../../hooks/useCurrentLocation';
+import { useStorageData } from '../../hooks/fetchAsyncStorage';
+import {
+  HomeCover,
+  LotieContainer,
+  CardHolder,
+  Title,
+  Description,
+  Content,
+} from './components/Styles';
 
 export const MainScreen = () => {
   const currentLocation = useCurrentLocation();
+  const user = useStorageData();
 
   //Component key will redraw calendars color switch issue.
   const theme = useTheme();
@@ -23,10 +33,11 @@ export const MainScreen = () => {
           <View style={styles.card}>
             <Card style={styles.cardContent}>
               <Icon name="Trophy" style={styles.icon} size={30} color={theme.dark} />
-              <Text>Current Streak</Text>
-              <Text>day</Text>
+              <Text>Total Reports</Text>
+              <Text>5</Text>
             </Card>
           </View>
+
           <View style={styles.card}>
             <Card style={styles.cardContent}>
               <Icon name="calendar" style={styles.icon} size={30} color={theme.dark} />
@@ -34,6 +45,7 @@ export const MainScreen = () => {
               <Text>session</Text>
             </Card>
           </View>
+
           <View style={styles.card}>
             <Card style={styles.cardContent}>
               <Icon name="clockcircleo" style={styles.icon} size={30} color={theme.dark} />
@@ -42,23 +54,45 @@ export const MainScreen = () => {
             </Card>
           </View>
         </ScrollView>
+        <View style={styles.quoteContainer}>
+          <HomeCover>
+            <CardHolder>
+              <Image
+                style={{ width: 130, height: 150 }}
+                source={require('../../../assets/selectLocation.png')}
+              />
+              <Content>
+                <Title>Share Location{'\n'}</Title>
+                <Description>Help us know where the </Description>
+                <Description>report accured by</Description>
+                <Description>allowing us your locations</Description>
+              </Content>
+            </CardHolder>
+          </HomeCover>
+        </View>
 
         <View style={styles.quoteContainer}>
           <Card style={styles.quoteCard}>
-            <Text>help us make your life in the city better</Text>
+            <Title>help us make your life in the city better</Title>
 
-            <Card style={styles.cardContent}>
-              <Text style={styles.quoteText}>click here to influence</Text>
-            </Card>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('ReportForm', {
-                  location: currentLocation,
-                });
-              }}
-              style={styles.button}>
-              <Text style={styles.quoteText}>Send Report</Text>
-            </TouchableOpacity>
+            <CardHolder>
+              <HomeCover>
+                <TouchableOpacity onPress={() => console.log('navigate')} style={styles.button}>
+                  <Text>Send Report</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => console.log('navigate')} style={styles.button}>
+                  <Text>Send Report</Text>
+                </TouchableOpacity>
+              </HomeCover>
+              <LottieView
+                key="clcker"
+                style={{ width: 200, height: 200 }}
+                autoPlay
+                resizeMode="contain"
+                loop
+                source={require('../../../assets/animation/click.json')}
+              />
+            </CardHolder>
           </Card>
         </View>
 
@@ -116,15 +150,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: colors.brand.primary,
+    backgroundColor: '#8EA7E9',
     margin: 10,
     borderRadius: 20,
-    shadowRadius: 2,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 1,
-
     width: 100,
     height: 50,
   },

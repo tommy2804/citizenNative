@@ -1,9 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { colors, mycolors } from '../theme/colors';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { AccountNavigator } from './accountNavigator';
 import { HomeNavigator } from './homeNavigator';
 import { StyleSheet } from 'react-native';
+import { ReportNavigator } from './reportNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,12 +19,14 @@ export const AppNavigator = () => (
       options={{
         headerBackTitle: 'Back',
         headerStyle: styles.header,
-        headerTitleStyle: styles.headerTitle,
-        headerTintColor: mycolors.light.white,
-        tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
+        headerShown: false,
+
+        tabBarIcon: ({ color, size }) => (
+          <MaterialIcons name="touch-app" size={size} color={color} />
+        ),
       }}
-      name="main"
-      component={HomeNavigator}
+      name="Quick Report"
+      component={ReportNavigator}
     />
     <Tab.Screen
       options={{
@@ -31,10 +34,12 @@ export const AppNavigator = () => (
         headerStyle: styles.header,
         headerTitleStyle: styles.headerTitle,
         headerTintColor: mycolors.light.white,
-        tabBarIcon: ({ color, size }) => <Ionicons name="shield" size={size} color={color} />,
+        tabBarIcon: ({ color, size }) => (
+          <MaterialIcons name="account-balance" size={size} color={color} />
+        ),
       }}
-      name="Reports"
-      component={AccountNavigator}
+      name="My Account"
+      component={HomeNavigator}
     />
 
     <Tab.Screen
@@ -57,6 +62,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   header: {
-    backgroundColor: mycolors.light.primary,
+    backgroundColor: mycolors.light.white,
   },
 });
