@@ -8,7 +8,17 @@ import {
   ButtonsContainer,
   CameraButton,
 } from './components/Styles';
-import { StyleSheet, Text, View, Dimensions, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+} from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
@@ -48,8 +58,14 @@ const ReportForm = () => {
   const [photo, setPhoto] = useState(null);
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState('');
+  const baseUrl = 'https://api.cloudinary.com/v1_1/dyzpajqfj/image/upload';
 
   const submitForm = async () => {
+    console.log('object');
+    if (reportTitle.length < 1 || description.length < 1) {
+      Alert.alert('Error', 'Cannot Submit Empty Form');
+      return;
+    }
     const res = await addReport({
       location: { lat: location.latitude, lng: location.longitude },
       reqTitle: reportTitle,
@@ -58,26 +74,88 @@ const ReportForm = () => {
       reqPhoto: image,
       reqStreet: location?.Address?.street,
     });
-    console.log(res);
+    // navigate to home if secceed and if not alert the error
+    if (res.status === 201) {
+      console.log(res.data);
+      Alert.alert('Success', 'Your report has been sent');
+      navigation.navigate('main');
+    } else {
+      Alert.alert('Error', res.data.message);
+    }
+  };
+  const takePicture = async () => {
+    let options = {
+      allowsEditing: true,
+      quality: 1,
+      base64: true,
+      exif: false,
+    };
+
+    const newPhoto = await cameraRef.current.takePictureAsync(options);
+    const base64 = `data:image/jpg;base64,${newPhoto.base64}`;
+    const uri = newPhoto.uri;
+    setPhoto(uri);
+    const data = {
+      file: base64,
+      upload_preset: 'cityhero',
+    };
+    await fetch(baseUrl, {
+      body: JSON.stringify(data),
+      headers: {
+        'content-type': 'application/json',
+      },
+      method: 'POST',
+    })
+      .then(async (r) => {
+        let data = await r.json();
+        console.log(data.secure_url);
+        setImage(data.secure_url);
+        return;
+      })
+
+      .catch((err) => console.log(err));
   };
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const options = {
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
       base64: true,
       aspect: [4, 3],
       quality: 1,
-    });
-    console.log(photo);
-
-    if (!result.canceled) {
-      setPhoto(result.assets[0]);
-      setImage(result.assets[0].base64);
+    };
+    const response = await ImagePicker.launchImageLibraryAsync(options);
+    // console.log('response', response);
+    if (response.canceled) {
+      console.log('User cancelled image picker');
+    } else if (response.error) {
+      console.log('ImagePicker Error: ', response.error);
+    } else {
+      const base64 = `data:image/jpg;base64,${response.assets[0].base64}`;
+      const uri = response.assets[0].uri;
+      setPhoto(uri);
+      const data = {
+        file: base64,
+        upload_preset: 'cityhero',
+      };
+      await fetch(baseUrl, {
+        body: JSON.stringify(data),
+        headers: {
+          'content-type': 'application/json',
+        },
+        method: 'POST',
+      })
+        .then(async (r) => {
+          let data = await r.json();
+          console.log(data.secure_url);
+          setImage(data.secure_url);
+          return;
+        })
+        .catch((err) => console.log(err));
     }
   };
-
+  // request permissions
   useEffect(() => {
     (async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
@@ -93,42 +171,25 @@ const ReportForm = () => {
     return <Text>No access to camera, please change this in the settings</Text>;
   }
 
-  const takePicture = async () => {
-    let options = {
-      quality: 1,
-      base64: true,
-      exif: false,
-    };
-
-    let newPhoto = await cameraRef.current.takePictureAsync(options);
-    console.log(newPhoto.base64);
-    setPhoto(newPhoto);
-    const reader = new FileReader();
-    reader.readAsDataURL(photo.uri);
-    reader.onloadend = () => {
-      setImage(reader.result);
-    };
-  };
-
-  if (photo && isImage) {
+  if (photo) {
     let sharePic = async () => {
       shareAsync(photo.uri).then(() => {
         MediaLibrary.saveToLibraryAsync(photo.uri).then(() => {
           setPhoto(null);
+          setIsImage(false);
         });
       });
     };
     let savePhoto = async () => {
-      MediaLibrary.saveToLibraryAsync(photo.uri).then(() => {
-        setPhoto(null);
-        setImage(photo.base64);
+      MediaLibrary.saveToLibraryAsync(photo).then(() => {
         setIsImage(false);
+        setPhoto(null);
       });
     };
 
     return (
       <>
-        <AccountBackground source={{ uri: photo.uri }}>
+        <AccountBackground source={{ uri: photo }}>
           <ButtonsContainer>
             <CameraButton
               title="Share"
@@ -152,13 +213,6 @@ const ReportForm = () => {
                 setPhoto(null);
                 setImage(null);
               }}
-            />
-            <CameraButton
-              buttonStyle={[styles.cameraButton, { padding: 10 }]}
-              title="Back"
-              icon={<Icon name="Back" type="font-awesome" color="white" size={15} />}
-              onPress={() => setIsImage(false)}
-              // onPress={() => navigation.navigate('TakePhoto')}
             />
           </ButtonsContainer>
         </AccountBackground>
@@ -216,54 +270,41 @@ const ReportForm = () => {
                   return item;
                 }}
               />
-              <AccountContainer>
-                <PersonalContainer>
-                  <View
-                    style={[
-                      styles.buttonContainer,
-                      {
-                        height: '100%',
-                        width: '100%',
-                      },
-                    ]}>
-                    <Button
-                      buttonStyle={{ width: 120, height: 40 }}
-                      title="Take Photo"
-                      onPress={() => setIsImage(true)}
-                    />
-
-                    <Button
-                      buttonStyle={{ width: 100, height: 40 }}
-                      title="gallery"
-                      onPress={pickImage}
-                    />
-                  </View>
-                </PersonalContainer>
-                {/* <Text>received your image</Text> */}
-                {image && <Text>received your image</Text>}
+              {/* <AccountContainer> */}
+              <View style={[styles.buttonContainer]}>
                 <Button
-                  buttonStyle={{
-                    width: 100,
-                    height: 40,
-                    backgroundColor: '#20262E',
-                    marginTop: 20,
-                    borderRadius: 120,
-                  }}
-                  title="Submit"
-                  onPress={submitForm}
+                  buttonStyle={[styles.uploadButton, { width: 120, height: 40 }]}
+                  title="Take Photo"
+                  onPress={() => setIsImage(true)}
                 />
-              </AccountContainer>
+
+                <Button
+                  buttonStyle={[styles.uploadButton, { width: 100, height: 40 }]}
+                  title="gallery"
+                  onPress={pickImage}
+                />
+              </View>
+
+              {/* <Text>received your image</Text> */}
+              {image && <Text>received your image</Text>}
+              {/* </AccountContainer> */}
             </AccountCover>
-            <View style={styles.animation}>
-              <LottieView
-                key="thankyou"
-                resizeMode="cover"
-                autoPlay
-                loop
-                source={require('../../../assets/animation/thankyou.json')}
-              />
-            </View>
+
+            {/* <View style={styles.animation}>
+                <LottieView
+                  key="thankyou"
+                  resizeMode="cover"
+                  autoPlay
+                  loop
+                  source={require('../../../assets/animation/thankyou.json')}
+                />
+              </View> */}
           </AccountBackground>
+          <View style={styles.uploadContainer}>
+            <TouchableOpacity onPress={submitForm} style={styles.submitButton}>
+              <Text style={styles.submitButtonText}>Send Report</Text>
+            </TouchableOpacity>
+          </View>
         </KeyboardAvoidingView>
       )}
     </>
@@ -286,7 +327,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#BDCDD6',
     borderRadius: 120,
-    width: 80,
+    width: 800,
   },
   image: {
     alignSelf: 'stretch',
@@ -299,18 +340,61 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 600,
   },
+
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    display: 'flex',
-    alignSelf: 'center',
-    marginHorizontal: 20,
-    marginVertical: 10,
+    width: Dimensions.get('window').width,
+    borderTopLeftRadius: 45,
+    borderTopRightRadius: 45,
+    width: Dimensions.get('window').width - 60,
+    margin: 20,
   },
   animation: {
     width: '100%',
     height: '40%',
     position: 'absolute',
-    bottom: -50,
+    bottom: 10,
+  },
+  uploadButton: {
+    borderRadius: 16,
+    alignSelf: 'center',
+    elevation: 4,
+    margin: 10,
+    padding: 10,
+    backgroundColor: '#93BFCF',
+  },
+
+  submitButton: {
+    borderRadius: 16,
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 7,
+      height: 5,
+    },
+    shadowOpacity: 1.58,
+    shadowRadius: 9,
+    elevation: 4,
+    margin: 10,
+    padding: 10,
+    backgroundColor: '#20262E',
+    width: Dimensions.get('window').width - 60,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+    color: '#f6f5f8',
+    fontSize: 20,
+    fontFamily: 'Roboto',
+  },
+  uploadContainer: {
+    backgroundColor: '#f6f5f8',
+    borderTopLeftRadius: 45,
+    borderTopRightRadius: 45,
+    position: 'absolute',
+    bottom: -65,
+    width: Dimensions.get('window').width,
+    height: 200,
+    marginBottom: 20,
   },
 });

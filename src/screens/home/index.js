@@ -3,8 +3,7 @@ import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Image } from 'rea
 import { Card } from 'react-native-elements';
 import { useTheme } from 'react-native-paper';
 import { AntDesign as Icon } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
-import { LottieAnimationWrapper } from '../../components/styles/lottieAnimtions';
+import { Button } from 'react-native-elements';
 import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCurrentLocation } from '../../hooks/useCurrentLocation';
@@ -21,10 +20,28 @@ import {
 export const MainScreen = () => {
   const currentLocation = useCurrentLocation();
   const user = useStorageData();
-
   //Component key will redraw calendars color switch issue.
   const theme = useTheme();
   const navigation = useNavigation();
+  if (!user) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>only sign up users can see this data :</Text>
+        <Text>please sign up to view this website</Text>
+        <LottieView
+          key="clcker"
+          style={{ width: 200, height: 200 }}
+          autoPlay
+          resizeMode="contain"
+          loop
+          source={require('../../../assets/animation/signup.json')}
+        />
+        <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.button}>
+          <Text>sign up</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <>
@@ -77,9 +94,6 @@ export const MainScreen = () => {
 
             <CardHolder>
               <HomeCover>
-                <TouchableOpacity onPress={() => console.log('navigate')} style={styles.button}>
-                  <Text>Send Report</Text>
-                </TouchableOpacity>
                 <TouchableOpacity onPress={() => console.log('navigate')} style={styles.button}>
                   <Text>Send Report</Text>
                 </TouchableOpacity>

@@ -56,6 +56,7 @@ export const PersonalInput = styled(Input)`
 
 export const Title = styled(Text)`
   font-size: 30px;
+  align-self: center;
 `;
 
 export const ErrorContainer = styled(View)`
