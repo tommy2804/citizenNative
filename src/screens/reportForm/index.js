@@ -1,7 +1,7 @@
 import {
   AccountContainer,
   FormInput,
-  PersonalContainer,
+  Spacer,
   Title,
   AccountBackground,
   AccountCover,
@@ -16,8 +16,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  ActivityIndicator,
   Alert,
-  ScrollView,
 } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
 import * as ImagePicker from 'expo-image-picker';
@@ -29,21 +29,11 @@ import SelectDropdown from 'react-native-select-dropdown';
 import { Icon } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 import { addReport } from '../../api';
-import LottieView from 'lottie-react-native';
 import { useCurrentLocation } from '../../hooks/useCurrentLocation';
 import { useStorageData } from '../../hooks/fetchAsyncStorage';
-let reports = [
-  'Potholes and Road Maintenance',
-  'Garbage and Waste Management',
-  'Street Lighting',
-  'Noise Pollution',
-  'Someone is blocking the sidewalk',
-  'Someone has taken my parking spot',
-  'Illegal Dumping and Graffiti',
-  'Building Code Violations',
-  'Traffic and Parking',
-  'Other',
-];
+import { Ionicons } from '@expo/vector-icons';
+
+let reports = ['Parking', 'Garbage', 'Sewerage', 'Noise', 'A hazard in the street', 'Other'];
 
 const { width, height } = Dimensions.get('window');
 const ReportForm = () => {
@@ -59,6 +49,7 @@ const ReportForm = () => {
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState('');
   const baseUrl = 'https://api.cloudinary.com/v1_1/dyzpajqfj/image/upload';
+  const [isLoading, setIsLoading] = useState(false);
 
   const submitForm = async () => {
     console.log('object');
@@ -99,6 +90,7 @@ const ReportForm = () => {
       file: base64,
       upload_preset: 'cityhero',
     };
+    setIsLoading(true);
     await fetch(baseUrl, {
       body: JSON.stringify(data),
       headers: {
@@ -107,9 +99,11 @@ const ReportForm = () => {
       method: 'POST',
     })
       .then(async (r) => {
+        setIsLoading(false);
         let data = await r.json();
         console.log(data.secure_url);
         setImage(data.secure_url);
+
         return;
       })
 
@@ -238,25 +232,15 @@ const ReportForm = () => {
           style={{ flex: 1 }}
           keyboardVerticalOffset={Platform.OS === 'ios' ? -64 : 0}>
           <AccountBackground>
+            <Title>Report Form</Title>
             <AccountCover>
-              <Text>{user?.fullName} thank you for your help.</Text>
-
-              <Title>Report Form</Title>
-
-              <FormInput
-                label="what happend"
-                value={description}
-                placeholder="decripe the problem"
-                onChangeText={(descr) => setDescription(descr)}
-                multiline={true}
-                numberOfLines={4}
-              />
+              <Spacer size={'40px'} />
               <SelectDropdown
                 label="Select a report"
                 data={reports}
                 search={true}
                 buttonStyle={{ width: 200, marginHorizontal: 20 }}
-                defaultButtonText="Titles"
+                defaultButtonText="Specify the problem"
                 onSelect={(selectedItem, index) => {
                   setReportTitle(selectedItem);
                   console.log(selectedItem);
@@ -270,14 +254,28 @@ const ReportForm = () => {
                   return item;
                 }}
               />
+
               {/* <AccountContainer> */}
+              <Spacer size={'20px'} />
+              <Text style={{ alignSelf: 'center', fontSize: '18px' }}>Upload Photo</Text>
               <View style={[styles.buttonContainer]}>
                 <Button
                   buttonStyle={[styles.uploadButton, { width: 120, height: 40 }]}
                   title="Take Photo"
                   onPress={() => setIsImage(true)}
                 />
+                {isLoading && (
+                  <View style={{ alignSelf: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator size="small" color="black" />
+                  </View>
+                )}
 
+                {image && (
+                  <View style={{ alignSelf: 'center', alignItems: 'center' }}>
+                    <Ionicons name="checkmark-sharp" size={34} color="black" />
+                    <Text style={{ fontSize: '10px' }}>received your image</Text>
+                  </View>
+                )}
                 <Button
                   buttonStyle={[styles.uploadButton, { width: 100, height: 40 }]}
                   title="gallery"
@@ -288,6 +286,18 @@ const ReportForm = () => {
               {/* <Text>received your image</Text> */}
               {image && <Text>received your image</Text>}
               {/* </AccountContainer> */}
+              <Spacer size={'20px'} />
+
+              <FormInput
+                label="What happend"
+                value={description}
+                placeholder="describe the problem"
+                onChangeText={(descr) => setDescription(descr)}
+                multiline={true}
+                numberOfLines={4}
+              />
+              <Spacer size={'20px'} />
+              <Text>{user?.fullName} thank you for your help.</Text>
             </AccountCover>
 
             {/* <View style={styles.animation}>
@@ -300,6 +310,7 @@ const ReportForm = () => {
                 />
               </View> */}
           </AccountBackground>
+          <Spacer size={'50px'} />
           <View style={styles.uploadContainer}>
             <TouchableOpacity onPress={submitForm} style={styles.submitButton}>
               <Text style={styles.submitButtonText}>Send Report</Text>
@@ -327,7 +338,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#BDCDD6',
     borderRadius: 120,
-    width: 800,
+    width: 100,
   },
   image: {
     alignSelf: 'stretch',
@@ -385,7 +396,6 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: '#f6f5f8',
     fontSize: 20,
-    fontFamily: 'Roboto',
   },
   uploadContainer: {
     backgroundColor: '#f6f5f8',

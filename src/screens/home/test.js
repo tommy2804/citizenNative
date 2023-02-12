@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
   uploadButtonText: {
     color: '#f6f5f8',
     fontSize: 20,
-    fontFamily: 'Roboto',
   },
 });
 export default Test;

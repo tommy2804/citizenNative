@@ -56,7 +56,7 @@ export const PersonalInput = styled(Input)`
 
 export const Title = styled(Text)`
   font-size: 30px;
-  align-self: center;
+  align-self: flex-start;
 `;
 
 export const ErrorContainer = styled(View)`
@@ -79,4 +79,8 @@ export const ButtonsContainer = styled(View)`
 export const CameraButton = styled(Button)`
   border-radius: 40%;
   background-color: black;
+`;
+export const Spacer = styled(View)`
+  width: 100%;
+  height: ${(props) => props.size || '100px'};
 `;
