@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, View, Platform } from 'react-native';
 import styled from 'styled-components/native';
 import { CustomText as Text } from '../../components/styles/customText';
-import brokenLight from '../../../assets/brokenLight.jpeg';
+import brokenLight from '../../../assets/images/brokenLight.jpeg';
 
 const CompactImage = styled(Image)`
   border-radius: 10px;

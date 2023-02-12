@@ -3,19 +3,11 @@ import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Image } from 'rea
 import { Card } from 'react-native-elements';
 import { useTheme } from 'react-native-paper';
 import { AntDesign as Icon } from '@expo/vector-icons';
-import { Button } from 'react-native-elements';
 import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useCurrentLocation } from '../../hooks/useCurrentLocation';
 import { useStorageData } from '../../hooks/fetchAsyncStorage';
-import {
-  HomeCover,
-  LotieContainer,
-  CardHolder,
-  Title,
-  Description,
-  Content,
-} from './components/Styles';
+import { HomeCover, CardHolder, Title, Description, Content } from './components/Styles';
 
 export const MainScreen = () => {
   const currentLocation = useCurrentLocation();
@@ -76,7 +68,7 @@ export const MainScreen = () => {
             <CardHolder>
               <Image
                 style={{ width: 130, height: 150 }}
-                source={require('../../../assets/selectLocation.png')}
+                source={require('../../../assets/images/selectLocation.png')}
               />
               <Content>
                 <Title>Share Location{'\n'}</Title>
